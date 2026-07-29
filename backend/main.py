@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from app.analyzer.code_analyzer import analyze_python_code
 import shutil
 import os
 
@@ -19,7 +20,6 @@ def home():
     }
 
 
-
 @app.post("/upload")
 async def upload_code(
     file: UploadFile = File(...)
@@ -36,9 +36,12 @@ async def upload_code(
         )
 
 
+    review = analyze_python_code(file_path)
+
+
     return {
 
         "filename":file.filename,
-        "status":"uploaded"
+        "issues":review
 
     }
