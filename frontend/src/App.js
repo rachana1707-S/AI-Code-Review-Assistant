@@ -1,44 +1,41 @@
 import Upload from "./components/Upload";
+import "./App.css";
+
 
 function App() {
-return (
-  <div className="max-w-2xl mx-auto">
 
-    <div className="bg-gray-800 p-8 rounded-2xl shadow-xl">
 
-      <h2 className="text-2xl font-semibold mb-4">
-        Upload Code for Review
-      </h2>
+  return (
 
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className="mb-4"
-      />
+    <div className="app-container">
 
-      <button
-        onClick={handleUpload}
-        className="bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded-lg transition"
-      >
-        {loading ? "Analyzing..." : "Analyze Code"}
-      </button>
+
+      <div className="hero">
+
+
+        <h1>
+          AI Code Review Assistant
+        </h1>
+
+
+        <p>
+          Analyze your code using AI,
+          detect bugs and improve quality.
+        </p>
+
+
+      </div>
+
+
+
+      <Upload />
+
 
     </div>
 
-    {result && (
-      <div className="mt-6 bg-gray-800 p-6 rounded-xl">
+  );
 
-        <h3 className="text-xl mb-2">Results</h3>
-
-        <pre className="bg-black p-4 rounded text-sm overflow-auto">
-          {JSON.stringify(result, null, 2)}
-        </pre>
-
-      </div>
-    )}
-
-  </div>
-);
 }
+
 
 export default App;
