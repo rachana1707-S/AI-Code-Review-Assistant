@@ -1,12 +1,9 @@
 import os
 
 
-def calculate():
-    x=10
-    y=20
+def login(password):
 
-    print(x+y)
+    if password=="12345":
+        return True
 
-
-
-calculate()
+    return False
