@@ -1,39 +1,21 @@
-import Upload from "./components/Upload";
+import Dashboard from "./components/Dashboard";
 import "./App.css";
 
 
-function App() {
+function App(){
 
 
-  return (
+return(
 
-    <div className="app-container">
+<div className="app-container">
 
+<Dashboard />
 
-      <div className="hero">
-
-
-        <h1>
-          AI Code Review Assistant
-        </h1>
+</div>
 
 
-        <p>
-          Analyze your code using AI,
-          detect bugs and improve quality.
-        </p>
+);
 
-
-      </div>
-
-
-
-      <Upload />
-
-
-    </div>
-
-  );
 
 }
 
