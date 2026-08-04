@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Editor from "@monaco-editor/react";
 
 import {
@@ -20,32 +20,33 @@ function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Read file content
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
+  const editorRef = useRef(null);
 
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      setCode(event.target.result);
-    };
-
-    reader.readAsText(selectedFile);
+  // 👇 Monaco mount
+  const handleEditorDidMount = (editor) => {
+    editorRef.current = editor;
   };
 
-  // Upload
-  const handleUpload = async () => {
+  // 👇 Read file
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    setFile(selected);
 
+    const reader = new FileReader();
+    reader.onload = (e) => setCode(e.target.result);
+
+    reader.readAsText(selected);
+  };
+
+  // 👇 Upload
+  const handleUpload = async () => {
     if (!file) return alert("Select file");
 
+    setLoading(true);
+
     try {
-      setLoading(true);
-
       const res = await uploadCode(file);
-
       setData(res);
-
     } catch (err) {
       console.error(err);
     }
@@ -53,7 +54,65 @@ function Dashboard() {
     setLoading(false);
   };
 
+  // 🔥 Convert AI label → severity
+  const mapSeverity = (label) => {
+
+    if (label === "LABEL_1") return "HIGH";
+    if (label === "LABEL_0") return "LOW";
+
+    return "MEDIUM";
+  };
+
+  // 🎨 Severity → color
+  const getColor = (severity) => {
+
+    if (severity === "HIGH") return "red";
+    if (severity === "MEDIUM") return "orange";
+
+    return "green";
+  };
+
   const issues = data?.analysis || [];
+
+  // 🔥 Highlight lines in Monaco
+  const getDecorations = () => {
+
+    if (!editorRef.current) return [];
+
+    return issues
+      .filter(i => i.line)
+      .map((issue) => ({
+
+        range: new window.monaco.Range(
+          issue.line,
+          1,
+          issue.line,
+          1
+        ),
+
+        options: {
+          isWholeLine: true,
+          className: `line-${getColor(mapSeverity(issue.label))}`
+        }
+      }));
+  };
+
+  // 👇 Apply decorations
+  React.useEffect(() => {
+
+    if (!editorRef.current) return;
+
+    editorRef.current.deltaDecorations([], getDecorations());
+
+  }, [data]);
+
+  // 👇 Jump to line
+  const jumpToLine = (line) => {
+
+    if (!line || !editorRef.current) return;
+
+    editorRef.current.revealLineInCenter(line);
+  };
 
   return (
 
@@ -95,40 +154,49 @@ function Dashboard() {
               defaultLanguage="python"
               value={code}
               theme="vs-dark"
+              onMount={handleEditorDidMount}
             />
 
           </div>
 
-          {/* Issues Panel */}
+          {/* Issues */}
           <div className="issues-panel">
 
             <h2>AI Issues</h2>
 
-            {issues.length === 0 && (
-              <p>No issues found</p>
-            )}
+            {issues.length === 0 && <p>No issues found</p>}
 
-            {issues.map((item, index) => (
+            {issues.map((item, index) => {
 
-              <div className="issue-card" key={index}>
+              const severity = mapSeverity(item.label);
 
-                <FaBug />
+              return (
 
-                <div>
-                  <h3>{item.label}</h3>
-                  <p>Confidence: {item.score}</p>
+                <div
+                  key={index}
+                  className={`issue-card ${severity.toLowerCase()}`}
+                  onClick={() => jumpToLine(item.line)}
+                >
+
+                  <FaBug />
+
+                  <div>
+                    <h3>{severity}</h3>
+                    <p>Line: {item.line || "N/A"}</p>
+                    <p>Confidence: {item.score}</p>
+                  </div>
+
                 </div>
 
-              </div>
+              );
 
-            ))}
+            })}
 
           </div>
 
         </div>
 
       </div>
-
     </div>
   );
 }

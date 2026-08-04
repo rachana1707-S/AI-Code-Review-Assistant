@@ -392,3 +392,29 @@ color:#F3E4C9;
   color: #F3E4C9;
   font-size: 20px;
 }
+
+/* Line highlights inside Monaco */
+.line-red {
+  background: rgba(255, 0, 0, 0.2);
+}
+
+.line-orange {
+  background: rgba(255, 165, 0, 0.2);
+}
+
+.line-green {
+  background: rgba(0, 255, 0, 0.15);
+}
+
+/* Issue card colors */
+.issue-card.high {
+  border-left: 5px solid red;
+}
+
+.issue-card.medium {
+  border-left: 5px solid orange;
+}
+
+.issue-card.low {
+  border-left: 5px solid green;
+}
