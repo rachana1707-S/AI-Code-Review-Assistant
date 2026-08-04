@@ -6,6 +6,12 @@ import React, {
 
 import Editor from "@monaco-editor/react";
 
+
+import QualityScore from "./Analytics/QualityScore";
+import IssueChart from "./Analytics/IssueChart";
+import AIRecommendation from "./Analytics/AIRecommendation";
+
+
 import {
   FaHome,
   FaHistory,
@@ -16,36 +22,45 @@ import {
   FaCheckCircle
 } from "react-icons/fa";
 
-import { uploadCode } from "../services/api";
+
+import {
+  uploadCode
+} from "../services/api";
+
 
 import "./Dashboard.css";
+
 
 
 function Dashboard() {
 
 
-  const [file, setFile] = useState(null);
+  const [file,setFile] = useState(null);
 
-  const [code, setCode] = useState("");
+  const [code,setCode] = useState("");
 
-  const [data, setData] = useState(null);
+  const [data,setData] = useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [loading,setLoading] = useState(false);
 
 
 
   const editorRef = useRef(null);
 
+  const monacoRef = useRef(null);
+
+  const decorationRef = useRef([]);
+
   const resizeObserverRef = useRef(null);
 
-  const monacoRef = useRef(null);
+
 
 
 
 
 
   /*
-      Monaco Editor Setup
+      Monaco Setup
   */
 
   const handleEditorDidMount = (
@@ -65,23 +80,21 @@ function Dashboard() {
 
 
 
-    if (container) {
+    if(container){
 
 
       resizeObserverRef.current =
-        new ResizeObserver(() => {
+      new ResizeObserver(()=>{
 
 
-          requestAnimationFrame(() => {
+        requestAnimationFrame(()=>{
 
-
-            editor.layout();
-
-
-          });
-
+          editor.layout();
 
         });
+
+
+      });
 
 
 
@@ -98,23 +111,22 @@ function Dashboard() {
 
 
 
+
+
+
   /*
-      Cleanup Resize Observer
+      Cleanup
   */
 
-  useEffect(() => {
+  useEffect(()=>{
 
 
-    return () => {
+    return()=>{
 
 
-      if (
-        resizeObserverRef.current
-      ) {
-
+      if(resizeObserverRef.current){
 
         resizeObserverRef.current.disconnect();
-
 
       }
 
@@ -122,7 +134,8 @@ function Dashboard() {
     };
 
 
-  }, []);
+  },[]);
+
 
 
 
@@ -131,17 +144,19 @@ function Dashboard() {
 
 
   /*
-      File Selection
+      File Reader
   */
 
-  const handleFileChange = (event) => {
+  const handleFileChange=(event)=>{
 
 
     const selectedFile =
       event.target.files[0];
 
 
-    if (!selectedFile) return;
+
+    if(!selectedFile)
+      return;
 
 
 
@@ -154,11 +169,9 @@ function Dashboard() {
 
 
 
-    reader.onload = (e) => {
-
+    reader.onload=(e)=>{
 
       setCode(e.target.result);
-
 
     };
 
@@ -177,29 +190,27 @@ function Dashboard() {
 
 
 
+
   /*
-      Upload Code
+      Upload
   */
 
-  const handleUpload = async () => {
+  const handleUpload=async()=>{
 
 
-    if (!file) {
-
+    if(!file){
 
       alert(
-        "Please select a code file"
+        "Please select a file"
       );
 
-
       return;
-
 
     }
 
 
 
-    try {
+    try{
 
 
       setLoading(true);
@@ -221,14 +232,13 @@ function Dashboard() {
 
 
       console.error(
-        "Upload failed:",
         error
       );
 
 
     }
 
-    finally {
+    finally{
 
 
       setLoading(false);
@@ -245,27 +255,20 @@ function Dashboard() {
 
 
 
+
   /*
-      AI Severity Mapping
+      Severity Mapping
   */
 
-  const mapSeverity = (label) => {
+  const mapSeverity=(label)=>{
 
 
-    if (
-      label === "LABEL_1"
-    )
-
+    if(label==="LABEL_1")
       return "HIGH";
 
 
-
-    if (
-      label === "LABEL_0"
-    )
-
+    if(label==="LABEL_0")
       return "LOW";
-
 
 
     return "MEDIUM";
@@ -279,33 +282,28 @@ function Dashboard() {
 
 
 
-
-  /*
-      Severity Colors
-  */
-
-  const getSeverityIcon = (
-    severity
-  ) => {
+  const getSeverityIcon=(severity)=>{
 
 
-    if (
-      severity === "HIGH"
-    )
-
-      return <FaBug/>;
+    switch(severity){
 
 
+      case "HIGH":
 
-    if (
-      severity === "MEDIUM"
-    )
-
-      return <FaShieldAlt/>;
+        return <FaBug/>;
 
 
+      case "MEDIUM":
 
-    return <FaCheckCircle/>;
+        return <FaShieldAlt/>;
+
+
+      default:
+
+        return <FaCheckCircle/>;
+
+
+    }
 
 
   };
@@ -317,20 +315,36 @@ function Dashboard() {
 
 
 
+
   /*
-      Backend Compatibility
+      Normalize Backend Response
 
       Supports:
 
       analysis:[]
       ai_review:[]
+      issues:[]
 
   */
 
   const issues =
-    data?.analysis ||
-    data?.ai_review ||
-    [];
+    (
+      data?.analysis ||
+      data?.ai_review ||
+      data?.issues ||
+      []
+    )
+    .map(item=>({
+
+      ...item,
+
+      severity:
+        item.severity ||
+        mapSeverity(
+          item.label
+        )
+
+    }));
 
 
 
@@ -340,13 +354,42 @@ function Dashboard() {
 
 
   /*
-      Highlight Issues
+      Quality Score
+
   */
 
-  useEffect(() => {
+  const qualityScore =
+
+    issues.length === 0
+
+    ?
+
+    100
+
+    :
+
+    Math.max(
+      50,
+      100 -
+      issues.length * 5
+    );
 
 
-    if (
+
+
+
+
+
+
+
+  /*
+      Monaco Highlighting
+  */
+
+  useEffect(()=>{
+
+
+    if(
       !editorRef.current ||
       !monacoRef.current
     )
@@ -356,69 +399,72 @@ function Dashboard() {
 
 
     const decorations =
+
       issues
+
       .filter(
-        item => item.line
+        item=>item.line
       )
-      .map(
-        item => {
+
+      .map(item=>{
 
 
-          const severity =
-            mapSeverity(
-              item.label
-            );
+        return {
+
+
+          range:
+
+          new monacoRef.current.Range(
+
+            item.line,
+
+            1,
+
+            item.line,
+
+            1
+
+          ),
+
+
+          options:{
+
+
+            isWholeLine:true,
+
+
+            className:
+
+            `line-${item.severity.toLowerCase()}`
+
+
+          }
+
+
+        };
+
+
+      });
 
 
 
-          return {
 
 
-            range:
-              new monacoRef.current.Range(
+    decorationRef.current =
 
-                item.line,
+      editorRef.current.deltaDecorations(
 
-                1,
+        decorationRef.current,
 
-                item.line,
-
-                1
-
-              ),
-
-
-
-            options:{
-
-
-              isWholeLine:true,
-
-
-              className:
-                `line-${severity.toLowerCase()}`
-
-
-            }
-
-
-          };
-
-
-        }
+        decorations
 
       );
 
 
 
-    editorRef.current.deltaDecorations(
-      [],
-      decorations
-    );
 
+  },[data]);
 
-
-  }, [data]);
 
 
 
@@ -428,12 +474,10 @@ function Dashboard() {
 
 
   /*
-      Jump To Issue Line
+      Jump To Line
   */
 
-  const jumpToLine = (
-    line
-  ) => {
+  const jumpToLine=(line)=>{
 
 
     if(
@@ -461,176 +505,167 @@ function Dashboard() {
 
 
 
+
+
+
   return (
 
 
-    <div className="dashboard">
+<div className="dashboard">
 
 
 
-      {/* Sidebar */}
 
-      <aside className="sidebar">
 
+{/* Sidebar */}
 
-        <h2>
-          🤖 CodeAI
-        </h2>
+<aside className="sidebar">
 
 
+<h2>
+🤖 CodeAI
+</h2>
 
-        <div className="menu">
 
 
-          <p>
-            <FaHome/>
-            Dashboard
-          </p>
+<div className="menu">
 
 
+<p>
+<FaHome/>
+Dashboard
+</p>
 
-          <p>
-            <FaHistory/>
-            Reviews
-          </p>
 
 
+<p>
+<FaHistory/>
+Reviews
+</p>
 
-          <p>
-            <FaCog/>
-            Settings
-          </p>
 
 
-        </div>
+<p>
+<FaCog/>
+Settings
+</p>
 
 
-      </aside>
+</div>
 
 
 
+</aside>
 
 
 
 
 
-      {/* Main */}
 
-      <main className="main-panel">
 
 
-        <h1>
-          AI Code Review
-        </h1>
 
+{/* Main */}
 
-        <p className="subtitle">
-          Analyze your code with AI powered insights
-        </p>
+<main className="main-panel">
 
 
 
+<h1>
+AI Code Review
+</h1>
 
 
 
-        {/* Upload */}
+<p className="subtitle">
 
-        <div className="upload-bar">
+Analyze your code with AI-powered insights
 
+</p>
 
-          <input
 
-            type="file"
 
-            accept=".py,.java,.js"
 
-            onChange={
-              handleFileChange
-            }
 
-          />
 
 
+{/* Upload */}
 
-          <button
-            onClick={
-              handleUpload
-            }
-          >
+<div className="upload-bar">
 
-            <FaUpload/>
 
+<input
 
-            {
-              loading
-              ?
-              "Analyzing..."
-              :
-              "Analyze"
-            }
+type="file"
 
+accept=".py,.java,.js"
 
-          </button>
+onChange={handleFileChange}
 
+/>
 
 
-        </div>
 
+<button
+onClick={handleUpload}
+>
 
 
+<FaUpload/>
 
 
+{
+loading
+?
+"Analyzing..."
+:
+"Analyze"
+}
 
 
-        {/* Editor + Issues */}
+</button>
 
-        <div className="split-view">
 
+</div>
 
 
 
 
 
-          <div className="editor-container">
 
 
-            <Editor
 
 
-              height="500px"
+{/* Analytics */}
 
+{
 
-              language="python"
+data &&
 
+<div className="analytics-grid">
 
-              value={code}
 
+<QualityScore
 
-              theme="vs-dark"
+score={qualityScore}
 
+/>
 
-              onMount={
-                handleEditorDidMount
-              }
 
 
-              options={{
+<IssueChart
 
-                fontSize:14,
+issues={issues}
 
-                minimap:{
-                  enabled:false
-                },
+/>
 
-                automaticLayout:true
 
-              }}
 
+</div>
 
-            />
+}
 
 
-          </div>
 
 
 
@@ -638,143 +673,229 @@ function Dashboard() {
 
 
 
+{/* Editor */}
 
+<div className="split-view">
 
-          <div className="issues-panel">
 
 
-            <h2>
-              AI Findings
-            </h2>
+<div className="editor-container">
 
 
+<Editor
 
 
-            {
-              issues.length===0 &&
+height="500px"
 
-              <p>
-                No issues detected yet
-              </p>
 
-            }
+language="python"
 
 
+value={code}
 
 
+theme="vs-dark"
 
 
-            {
-              issues.map(
-                (item,index)=>{
 
+onMount={
+handleEditorDidMount
+}
 
-                  const severity =
-                    mapSeverity(
-                      item.label
-                    );
 
 
+options={{
 
-                  return (
+fontSize:14,
 
+minimap:{
+enabled:false
+},
 
-                    <div
+automaticLayout:true
 
-                      key={index}
+}}
 
-                      className={
-                        `issue-card ${severity.toLowerCase()}`
-                      }
 
 
-                      onClick={() =>
-                        jumpToLine(
-                          item.line
-                        )
-                      }
+/>
 
 
-                    >
+</div>
 
 
-                      {
-                        getSeverityIcon(
-                          severity
-                        )
-                      }
 
 
 
-                      <div>
 
 
-                        <h3>
-                          {severity}
-                        </h3>
 
 
+{/* Issues */}
 
-                        <p>
-                          Line:
-                          {
-                            item.line ||
-                            "N/A"
-                          }
-                        </p>
+<div className="issues-panel">
 
 
+<h2>
+AI Findings
+</h2>
 
-                        <p>
 
-                          Confidence:
-                          {
-                            item.score
-                            ?
-                            Number(
-                              item.score
-                            ).toFixed(2)
-                            :
-                            "N/A"
-                          }
 
-                        </p>
+{
 
+issues.length===0
 
-                      </div>
+&&
 
+<p>
+No issues detected yet
+</p>
 
-                    </div>
+}
 
 
-                  );
 
 
-                }
 
-              )
 
-            }
+{
 
+issues.map(
+(item,index)=>{
 
 
-          </div>
+return(
 
 
+<div
 
+key={index}
 
-        </div>
+className={
+`issue-card ${item.severity.toLowerCase()}`
+}
 
 
+onClick={()=>jumpToLine(item.line)}
 
-      </main>
 
 
+>
 
-    </div>
 
+{
+getSeverityIcon(
+item.severity
+)
+}
 
-  );
+
+
+<div>
+
+
+<h3>
+{item.severity}
+</h3>
+
+
+
+<p>
+Line:
+{
+item.line || "N/A"
+}
+</p>
+
+
+
+<p>
+
+Confidence:
+
+{
+item.score
+?
+
+Number(
+item.score
+)
+.toFixed(2)
+
+:
+
+"N/A"
+
+}
+
+</p>
+
+
+
+</div>
+
+
+</div>
+
+
+
+);
+
+
+}
+
+)
+
+
+}
+
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* AI Explanation */}
+
+{
+
+data &&
+
+<AIRecommendation
+
+issues={issues}
+
+/>
+
+}
+
+
+
+</main>
+
+
+
+
+
+</div>
+
+
+);
 
 
 }
