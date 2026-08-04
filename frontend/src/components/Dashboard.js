@@ -35,13 +35,13 @@ import "./Dashboard.css";
 function Dashboard() {
 
 
-  const [file,setFile] = useState(null);
+  const [file, setFile] = useState(null);
 
-  const [code,setCode] = useState("");
+  const [code, setCode] = useState("");
 
-  const [data,setData] = useState(null);
+  const [data, setData] = useState(null);
 
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -52,8 +52,6 @@ function Dashboard() {
   const decorationRef = useRef([]);
 
   const resizeObserverRef = useRef(null);
-
-
 
 
 
@@ -124,7 +122,9 @@ function Dashboard() {
     return()=>{
 
 
-      if(resizeObserverRef.current){
+      if(
+        resizeObserverRef.current
+      ){
 
         resizeObserverRef.current.disconnect();
 
@@ -143,16 +143,16 @@ function Dashboard() {
 
 
 
+
   /*
-      File Reader
+      File Selection
   */
 
-  const handleFileChange=(event)=>{
+  const handleFileChange = (event)=>{
 
 
     const selectedFile =
       event.target.files[0];
-
 
 
     if(!selectedFile)
@@ -171,7 +171,11 @@ function Dashboard() {
 
     reader.onload=(e)=>{
 
-      setCode(e.target.result);
+
+      setCode(
+        e.target.result
+      );
+
 
     };
 
@@ -191,22 +195,26 @@ function Dashboard() {
 
 
 
+
   /*
       Upload
   */
 
-  const handleUpload=async()=>{
+  const handleUpload = async()=>{
 
 
     if(!file){
+
 
       alert(
         "Please select a file"
       );
 
+
       return;
 
     }
+
 
 
 
@@ -232,6 +240,7 @@ function Dashboard() {
 
 
       console.error(
+        "Upload error:",
         error
       );
 
@@ -256,19 +265,45 @@ function Dashboard() {
 
 
 
+
   /*
       Severity Mapping
+
+      Supports:
+
+      HIGH
+      MEDIUM
+      LOW
+
+      and old labels
+
   */
 
-  const mapSeverity=(label)=>{
+  const mapSeverity = (label)=>{
+
+
+    if(
+      label==="HIGH" ||
+      label==="MEDIUM" ||
+      label==="LOW"
+    ){
+
+      return label;
+
+    }
+
 
 
     if(label==="LABEL_1")
+
       return "HIGH";
 
 
+
     if(label==="LABEL_0")
+
       return "LOW";
+
 
 
     return "MEDIUM";
@@ -281,6 +316,12 @@ function Dashboard() {
 
 
 
+
+
+
+  /*
+      Icons
+  */
 
   const getSeverityIcon=(severity)=>{
 
@@ -317,34 +358,49 @@ function Dashboard() {
 
 
   /*
-      Normalize Backend Response
-
-      Supports:
-
-      analysis:[]
-      ai_review:[]
-      issues:[]
+      Normalize AI Response
 
   */
 
   const issues =
+
     (
+
       data?.analysis ||
+
       data?.ai_review ||
+
       data?.issues ||
+
       []
+
     )
-    .map(item=>({
 
-      ...item,
+    .map(item=>{
 
-      severity:
-        item.severity ||
+
+      return {
+
+
+        ...item,
+
+
+        severity:
+
         mapSeverity(
+
+          item.severity ||
+
           item.label
+
         )
 
-    }));
+
+      };
+
+
+    });
+
 
 
 
@@ -360,19 +416,48 @@ function Dashboard() {
 
   const qualityScore =
 
-    issues.length === 0
+
+    data?.quality_score !== undefined
+
 
     ?
 
-    100
+
+    data.quality_score
+
 
     :
 
-    Math.max(
-      50,
-      100 -
-      issues.length * 5
+
+    (
+
+      issues.length===0
+
+
+      ?
+
+
+      100
+
+
+      :
+
+
+      Math.max(
+
+        50,
+
+        100 -
+
+        issues.length * 5
+
+      )
+
+
     );
+
+
+
 
 
 
@@ -390,21 +475,28 @@ function Dashboard() {
 
 
     if(
+
       !editorRef.current ||
+
       !monacoRef.current
+
     )
 
       return;
 
 
 
+
+
     const decorations =
+
 
       issues
 
       .filter(
         item=>item.line
       )
+
 
       .map(item=>{
 
@@ -413,6 +505,7 @@ function Dashboard() {
 
 
           range:
+
 
           new monacoRef.current.Range(
 
@@ -427,6 +520,7 @@ function Dashboard() {
           ),
 
 
+
           options:{
 
 
@@ -435,7 +529,11 @@ function Dashboard() {
 
             className:
 
-            `line-${item.severity.toLowerCase()}`
+            `line-${
+
+              item.severity.toLowerCase()
+
+            }`
 
 
           }
@@ -450,7 +548,9 @@ function Dashboard() {
 
 
 
+
     decorationRef.current =
+
 
       editorRef.current.deltaDecorations(
 
@@ -481,8 +581,11 @@ function Dashboard() {
 
 
     if(
+
       !line ||
+
       !editorRef.current
+
     )
 
       return;
@@ -508,7 +611,9 @@ function Dashboard() {
 
 
 
-  return (
+
+
+return (
 
 
 <div className="dashboard">
@@ -517,7 +622,10 @@ function Dashboard() {
 
 
 
+
+
 {/* Sidebar */}
+
 
 <aside className="sidebar">
 
@@ -551,8 +659,8 @@ Settings
 </p>
 
 
-</div>
 
+</div>
 
 
 </aside>
@@ -566,6 +674,7 @@ Settings
 
 
 {/* Main */}
+
 
 <main className="main-panel">
 
@@ -589,7 +698,10 @@ Analyze your code with AI-powered insights
 
 
 
+
+
 {/* Upload */}
+
 
 <div className="upload-bar">
 
@@ -606,6 +718,7 @@ onChange={handleFileChange}
 
 
 
+
 <button
 onClick={handleUpload}
 >
@@ -615,15 +728,23 @@ onClick={handleUpload}
 
 
 {
+
 loading
+
 ?
+
 "Analyzing..."
+
 :
+
 "Analyze"
+
 }
 
 
+
 </button>
+
 
 
 </div>
@@ -638,9 +759,11 @@ loading
 
 {/* Analytics */}
 
+
 {
 
 data &&
+
 
 <div className="analytics-grid">
 
@@ -663,6 +786,7 @@ issues={issues}
 
 </div>
 
+
 }
 
 
@@ -673,9 +797,13 @@ issues={issues}
 
 
 
-{/* Editor */}
+{/* Editor + Issues */}
+
 
 <div className="split-view">
+
+
+
 
 
 
@@ -698,9 +826,7 @@ theme="vs-dark"
 
 
 
-onMount={
-handleEditorDidMount
-}
+onMount={handleEditorDidMount}
 
 
 
@@ -731,14 +857,16 @@ automaticLayout:true
 
 
 
-{/* Issues */}
-
 <div className="issues-panel">
+
 
 
 <h2>
 AI Findings
 </h2>
+
+
+
 
 
 
@@ -753,6 +881,7 @@ No issues detected yet
 </p>
 
 }
+
 
 
 
@@ -784,6 +913,7 @@ onClick={()=>jumpToLine(item.line)}
 >
 
 
+
 {
 getSeverityIcon(
 item.severity
@@ -802,28 +932,19 @@ item.severity
 
 
 <p>
-Line:
 {
-item.line || "N/A"
+item.title ||
+"Code Issue"
 }
 </p>
 
 
 
 <p>
-
-Confidence:
+Line:
 
 {
-item.score
-?
-
-Number(
-item.score
-)
-.toFixed(2)
-
-:
+item.line ||
 
 "N/A"
 
@@ -833,11 +954,36 @@ item.score
 
 
 
+<p>
+
+Confidence:
+
+{
+
+item.score
+
+?
+
+Number(
+item.score
+).toFixed(2)
+
+:
+
+"N/A"
+
+}
+
+
+</p>
+
+
+
 </div>
 
 
-</div>
 
+</div>
 
 
 );
@@ -853,8 +999,8 @@ item.score
 
 
 
-
 </div>
+
 
 
 
@@ -872,9 +1018,12 @@ item.score
 
 {/* AI Explanation */}
 
+
+
 {
 
 data &&
+
 
 <AIRecommendation
 
@@ -882,13 +1031,13 @@ issues={issues}
 
 />
 
+
 }
 
 
 
+
 </main>
-
-
 
 
 
@@ -898,8 +1047,8 @@ issues={issues}
 );
 
 
-}
 
+}
 
 
 export default Dashboard;
