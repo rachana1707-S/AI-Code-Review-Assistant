@@ -1,282 +1,136 @@
-import React from "react";
+import React, { useState } from "react";
+import Editor from "@monaco-editor/react";
 
 import {
-FaHome,
-FaHistory,
-FaCog,
-FaBug,
-FaShieldAlt,
-FaCheckCircle
+  FaHome,
+  FaHistory,
+  FaCog,
+  FaUpload,
+  FaBug
 } from "react-icons/fa";
 
-
-import {
-motion
-} from "framer-motion";
-
+import { uploadCode } from "../services/api";
 
 import "./Dashboard.css";
 
+function Dashboard() {
 
+  const [file, setFile] = useState(null);
+  const [code, setCode] = useState("");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-function Dashboard(){
+  // Read file content
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
 
+    const reader = new FileReader();
 
-return(
+    reader.onload = (event) => {
+      setCode(event.target.result);
+    };
 
+    reader.readAsText(selectedFile);
+  };
 
-<div className="dashboard">
+  // Upload
+  const handleUpload = async () => {
 
+    if (!file) return alert("Select file");
 
+    try {
+      setLoading(true);
 
-{/* Sidebar */}
+      const res = await uploadCode(file);
 
-<div className="sidebar">
+      setData(res);
 
+    } catch (err) {
+      console.error(err);
+    }
 
-<h2>
-🤖 CodeAI
-</h2>
+    setLoading(false);
+  };
 
+  const issues = data?.analysis || [];
 
-<div className="menu">
+  return (
 
-<p>
-<FaHome/>
- Dashboard
-</p>
+    <div className="dashboard">
 
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h2>🤖 CodeAI</h2>
 
-<p>
-<FaHistory/>
- Reviews
-</p>
+        <div className="menu">
+          <p><FaHome /> Dashboard</p>
+          <p><FaHistory /> Reviews</p>
+          <p><FaCog /> Settings</p>
+        </div>
+      </div>
 
+      {/* Main */}
+      <div className="main-panel">
 
-<p>
-<FaCog/>
- Settings
-</p>
+        <h1>AI Code Review</h1>
 
+        {/* Upload */}
+        <div className="upload-bar">
+          <input type="file" onChange={handleFileChange} />
+          <button onClick={handleUpload}>
+            <FaUpload />
+            {loading ? "Analyzing..." : "Analyze"}
+          </button>
+        </div>
 
-</div>
+        {/* Split View */}
+        <div className="split-view">
 
+          {/* Editor */}
+          <div className="editor-container">
 
-</div>
+            <Editor
+              height="500px"
+              defaultLanguage="python"
+              value={code}
+              theme="vs-dark"
+            />
 
+          </div>
 
+          {/* Issues Panel */}
+          <div className="issues-panel">
 
+            <h2>AI Issues</h2>
 
+            {issues.length === 0 && (
+              <p>No issues found</p>
+            )}
 
-{/* Main */}
+            {issues.map((item, index) => (
 
-<div className="main-panel">
+              <div className="issue-card" key={index}>
 
+                <FaBug />
 
-<h1>
-AI Code Review Dashboard
-</h1>
+                <div>
+                  <h3>{item.label}</h3>
+                  <p>Confidence: {item.score}</p>
+                </div>
 
+              </div>
 
-<p className="subtitle">
+            ))}
 
-Your intelligent coding assistant
+          </div>
 
-</p>
+        </div>
 
+      </div>
 
-
-
-
-<div className="cards">
-
-
-
-<motion.div
-className="card score"
-whileHover={{
-scale:1.05
-}}
->
-
-<h3>
-Code Quality
-</h3>
-
-
-<h1>
-87
-<span>
-/100
-</span>
-</h1>
-
-
-</motion.div>
-
-
-
-
-
-
-<motion.div
-className="card"
-whileHover={{
-scale:1.05
-}}
->
-
-
-<FaBug/>
-
-
-<h3>
-Issues Found
-</h3>
-
-
-<h1>
-12
-</h1>
-
-
-</motion.div>
-
-
-
-
-
-
-<motion.div
-className="card"
-whileHover={{
-scale:1.05
-}}
->
-
-
-<FaShieldAlt/>
-
-
-<h3>
-Security
-</h3>
-
-
-<h1>
-Good
-</h1>
-
-
-</motion.div>
-
-
-
-</div>
-
-
-
-
-
-
-<div className="review-panel">
-
-
-<h2>
-Latest AI Suggestions
-</h2>
-
-
-
-<div className="issue">
-
-<FaBug/>
-
-<div>
-
-<h3>
-Possible Bug
-</h3>
-
-<p>
-Handle empty input validation.
-</p>
-
-</div>
-
-
-</div>
-
-
-
-
-<div className="issue">
-
-<FaShieldAlt/>
-
-<div>
-
-<h3>
-Security Improvement
-</h3>
-
-<p>
-Avoid hardcoded credentials.
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<div className="issue">
-
-
-<FaCheckCircle/>
-
-
-<div>
-
-<h3>
-Optimization
-</h3>
-
-
-<p>
-Improve loop efficiency.
-</p>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-);
-
-
+    </div>
+  );
 }
-
-
 
 export default Dashboard;

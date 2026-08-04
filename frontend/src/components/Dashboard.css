@@ -316,3 +316,79 @@ color:#F3E4C9;
 
 
 }
+
+.upload-bar {
+
+  margin-top: 20px;
+
+  display: flex;
+  gap: 15px;
+
+}
+
+.upload-bar input {
+
+  flex: 1;
+  padding: 10px;
+
+  border-radius: 10px;
+  border: none;
+
+}
+
+.upload-bar button {
+
+  padding: 10px 20px;
+
+  border-radius: 10px;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    90deg,
+    #8B5E3C,
+    #D3D4C0
+  );
+
+}
+.split-view {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.editor-container {
+  flex: 2;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.issues-panel {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 15px;
+  overflow-y: auto;
+}
+
+.issue-card {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+
+  background: rgba(10,41,71,0.8);
+
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.issue-card svg {
+  color: #F3E4C9;
+  font-size: 20px;
+}
