@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Depends
+from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -7,23 +7,22 @@ from app.analyzer.code_analyzer import analyze_python_code
 from app.analyzer.quality_analyzer import analyze_quality
 from app.analyzer.scoring import calculate_quality_score
 from app.analyzer.normalizer import normalize_issues
-from app.database import get_db, engine
-from app.models import Base, Review
+from app.analyzer.language_detector import detect_language
+from app.auth.auth import get_current_user
 from app.auth.routes import router as auth_router
+from app.database import get_db, engine
+from app.models import Base, Review, User
 
 import shutil
 import os
 import json
 
-
 Base.metadata.create_all(bind=engine)
-
 
 app = FastAPI(
     title="AI Code Review Assistant",
     description="AI powered code analysis platform using CodeBERT"
 )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,13 +35,10 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
 app.include_router(auth_router)
-
 
 UPLOAD_FOLDER = "app/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 
 @app.get("/")
 def home():
@@ -50,23 +46,72 @@ def home():
         "message": "AI Code Review Assistant Running"
     }
 
+@app.get("/me")
+def get_profile(
+    current_user: User = Depends(get_current_user)
+):
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email
+    }
 
 @app.post("/upload")
 async def upload_code(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    file_path = f"{UPLOAD_FOLDER}/{file.filename}"
+    language = detect_language(file.filename)
+
+    if language == "unknown":
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type. Upload Python, JavaScript, or Java code."
+        )
+
+    safe_filename = os.path.basename(file.filename)
+
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        safe_filename
+    )
 
     with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        code = f.read()
+    try:
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8"
+        ) as f:
+            code = f.read()
 
-    syntax_review = analyze_python_code(file_path)
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=400,
+            detail="The uploaded file is not valid UTF-8 text."
+        )
 
-    quality_review = analyze_quality(file_path)
+    syntax_review = []
+
+    quality_review = {
+        "pylint_issues": [],
+        "flake8_issues": []
+    }
+
+    if language == "python":
+        syntax_review = analyze_python_code(
+            file_path
+        )
+
+        quality_review = analyze_quality(
+            file_path
+        )
 
     ai_review = analyze_with_ai(code)
 
@@ -100,10 +145,11 @@ async def upload_code(
     )
 
     review = Review(
-        filename=file.filename,
+        filename=safe_filename,
         code=code,
         quality_score=quality_score,
-        analysis=json.dumps(issues)
+        analysis=json.dumps(issues),
+        user_id=current_user.id
     )
 
     db.add(review)
@@ -112,7 +158,8 @@ async def upload_code(
 
     return {
         "id": review.id,
-        "filename": file.filename,
+        "filename": safe_filename,
+        "language": language,
         "analysis": issues,
         "quality_score": quality_score,
         "syntax_review": syntax_review,
@@ -123,13 +170,16 @@ async def upload_code(
         )
     }
 
-
 @app.get("/reviews")
 def get_reviews(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     reviews = (
         db.query(Review)
+        .filter(
+            Review.user_id == current_user.id
+        )
         .order_by(
             Review.created_at.desc()
         )
