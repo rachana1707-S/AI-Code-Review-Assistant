@@ -1,420 +1,843 @@
-.dashboard{
-
-
-display:flex;
-
-min-height:100vh;
-
-
-color:#F3E4C9;
-
-
-}
-
-
-
-
-.sidebar{
-
-
-width:250px;
-
-
-background:
-
-rgba(
-0,0,0,.25
-);
-
-
-backdrop-filter:blur(20px);
-
-
-padding:30px;
-
-
-border-right:
-
-1px solid
-rgba(
-243,228,201,.2
-);
-
-
-
-}
-
-
-
-.sidebar h2{
-
-
-font-size:28px;
-
-
-margin-bottom:40px;
-
-
-}
-
-
-
-.menu p{
-
-
-display:flex;
-
-
-align-items:center;
-
-
-gap:15px;
-
-
-padding:15px;
-
-
-border-radius:12px;
-
-
-cursor:pointer;
-
-
-color:#D3D4C0;
-
-
-}
-
-
-
-.menu p:hover{
-
-
-background:
-
-rgba(
-243,
-228,
-201,
-0.15
-);
-
-
-
-color:white;
-
-
-}
-
-
-
-
-
-.main-panel{
-
-
-flex:1;
-
-
-padding:40px;
-
-
-}
-
-
-
-
-
-.main-panel h1{
-
-
-font-size:40px;
-
-
-}
-
-
-
-.subtitle{
-
-
-color:#D3D4C0;
-
-
-}
-
-
-
-
-
-.cards{
-
-
-display:flex;
-
-
-gap:25px;
-
-
-margin-top:40px;
-
-
-}
-
-
-
-
-.card{
-
-
-flex:1;
-
-
-background:
-
-
-rgba(
-255,
-255,
-255,
-.08
-);
-
-
-
-padding:30px;
-
-
-border-radius:20px;
-
-
-border:
-
-1px solid
-rgba(
-255,
-255,
-255,.15
-);
-
-
-
-}
-
-
-
-.card svg{
-
-
-font-size:35px;
-
-
-color:#D3D4C0;
-
-
-}
-
-
-
-
-.card h1{
-
-
-font-size:45px;
-
-
-}
-
-
-
-.card span{
-
-
-font-size:20px;
-
-
-color:#D3D4C0;
-
-
-}
-
-
-
-
-
-.review-panel{
-
-
-margin-top:40px;
-
-
-background:
-
-
-rgba(
-255,
-255,
-255,.08
-);
-
-
-
-padding:30px;
-
-
-border-radius:20px;
-
-
-}
-
-
-
-.issue{
-
-
-display:flex;
-
-
-gap:20px;
-
-
-align-items:center;
-
-
-background:
-
-
-rgba(
-10,
-41,
-71,
-.8
-);
-
-
-
-padding:20px;
-
-
-margin-top:15px;
-
-
-border-radius:15px;
-
-
-}
-
-
-
-.issue svg{
-
-
-font-size:30px;
-
-
-color:#F3E4C9;
-
-
-}
-
-.upload-bar {
-
-  margin-top: 20px;
-
+.dashboard {
   display: flex;
+  min-height: 100vh;
+
+  color: #F3E4C9;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139, 94, 60, 0.42),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(211, 212, 192, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #0A2947,
+      #081c31
+    );
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+
+  background: rgba(4, 20, 35, 0.55);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-right:
+    1px solid
+    rgba(243, 228, 201, 0.14);
+}
+
+
+.sidebar h2 {
+  margin: 0 0 40px 0;
+
+  font-size: 28px;
+
+  color: #F3E4C9;
+}
+
+
+/* =========================
+   SIDEBAR MENU
+========================= */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.menu-link {
+  display: block;
+
+  color: inherit;
+
+  text-decoration: none;
+}
+
+
+.menu-link p {
+  margin: 0;
+}
+
+
+.menu p {
+  display: flex;
+
+  align-items: center;
+
   gap: 15px;
 
-}
+  margin: 0;
 
-.upload-bar input {
+  padding: 15px;
 
-  flex: 1;
-  padding: 10px;
+  border-radius: 12px;
 
-  border-radius: 10px;
-  border: none;
-
-}
-
-.upload-bar button {
-
-  padding: 10px 20px;
-
-  border-radius: 10px;
-  border: none;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  color: #D3D4C0;
 
   cursor: pointer;
 
-  background: linear-gradient(
-    90deg,
-    #8B5E3C,
-    #D3D4C0
-  );
-
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
 }
+
+
+.menu p:hover {
+  color: #F3E4C9;
+
+  background:
+    rgba(
+      243,
+      228,
+      201,
+      0.12
+    );
+
+  transform: translateX(4px);
+}
+
+
+.active-menu {
+  color: #F3E4C9 !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(139, 94, 60, 0.38),
+      rgba(243, 228, 201, 0.08)
+    );
+}
+
+
+/* =========================
+   MAIN PANEL
+========================= */
+
+.main-panel {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 40px;
+
+  box-sizing: border-box;
+}
+
+
+.dashboard-heading {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+
+.main-panel h1 {
+  margin: 0;
+
+  font-size: 40px;
+
+  color: #F3E4C9;
+}
+
+
+.subtitle {
+  margin-top: 8px;
+
+  color: #D3D4C0;
+}
+
+
+/* =========================
+   UPLOAD BAR
+========================= */
+
+.upload-bar {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-top: 28px;
+}
+
+
+.upload-bar input {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  border-radius: 13px;
+
+  border:
+    1px solid
+    rgba(243, 228, 201, 0.16);
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  color: #F3E4C9;
+
+  outline: none;
+}
+
+
+.upload-bar input::file-selector-button {
+  margin-right: 14px;
+
+  padding: 9px 15px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #F3E4C9;
+
+  color: #0A2947;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.upload-bar button {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 12px 22px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #8B5E3C,
+      #D3D4C0
+    );
+
+  color: #0A2947;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+
+.upload-bar button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px
+    rgba(0, 0, 0, 0.25);
+}
+
+
+.upload-bar button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+.selected-file {
+  margin-top: 12px;
+
+  font-size: 14px;
+
+  color: #D3D4C0;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.dashboard-error {
+  margin-top: 20px;
+
+  padding: 15px 18px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid
+    rgba(139, 94, 60, 0.9);
+
+  background:
+    rgba(
+      139,
+      94,
+      60,
+      0.25
+    );
+
+  color: #F3E4C9;
+}
+
+
+/* =========================
+   ANALYTICS
+========================= */
+
+.analytics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 20px;
+
+  margin-top: 30px;
+}
+
+
+/* =========================
+   EDITOR + FINDINGS
+========================= */
+
 .split-view {
   display: flex;
+
+  align-items: stretch;
+
   gap: 20px;
-  margin-top: 20px;
+
+  margin-top: 25px;
 }
+
 
 .editor-container {
   flex: 2;
-  border-radius: 15px;
+
+  min-width: 0;
+
+  height: 500px;
+
   overflow: hidden;
+
+  border-radius: 16px;
+
+  border:
+    1px solid
+    rgba(243, 228, 201, 0.12);
+
+  background: #161616;
+
+  box-shadow:
+    0 18px 40px
+    rgba(0, 0, 0, 0.18);
 }
+
 
 .issues-panel {
   flex: 1;
-  background: rgba(255,255,255,0.08);
-  padding: 20px;
-  border-radius: 15px;
+
+  min-width: 280px;
+
+  max-height: 500px;
+
   overflow-y: auto;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  border-radius: 16px;
+
+  border:
+    1px solid
+    rgba(243, 228, 201, 0.12);
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  backdrop-filter: blur(14px);
 }
+
+
+.issues-panel h2 {
+  margin: 0 0 18px 0;
+
+  color: #F3E4C9;
+}
+
+
+/* =========================
+   ISSUE CARDS
+========================= */
 
 .issue-card {
   display: flex;
-  gap: 15px;
-  align-items: center;
 
-  background: rgba(10,41,71,0.8);
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-top: 12px;
 
   padding: 15px;
-  margin-top: 10px;
-  border-radius: 10px;
+
+  border-radius: 13px;
+
+  background:
+    rgba(
+      10,
+      41,
+      71,
+      0.82
+    );
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
+
+
+.issue-card:hover {
+  transform: translateY(-2px);
+
+  background:
+    rgba(
+      10,
+      41,
+      71,
+      1
+    );
+}
+
 
 .issue-card svg {
-  color: #F3E4C9;
   font-size: 20px;
+
+  color: #F3E4C9;
 }
 
-/* Line highlights inside Monaco */
-.line-red {
-  background: rgba(255, 0, 0, 0.2);
+
+.issue-icon {
+  padding-top: 3px;
 }
 
-.line-orange {
-  background: rgba(255, 165, 0, 0.2);
+
+.issue-content {
+  flex: 1;
+
+  min-width: 0;
 }
 
-.line-green {
-  background: rgba(0, 255, 0, 0.15);
+
+.issue-heading {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
 }
 
-/* Issue card colors */
+
+.issue-heading h3 {
+  margin: 0;
+
+  color: #F3E4C9;
+
+  font-size: 15px;
+}
+
+
+.issue-content p {
+  margin: 8px 0;
+
+  color: #D3D4C0;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.issue-meta {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 15px;
+
+  margin-top: 8px;
+
+  color: #D3D4C0;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   ISSUE SEVERITY
+========================= */
+
 .issue-card.high {
-  border-left: 5px solid red;
+  border-left: 5px solid #8B5E3C;
 }
+
 
 .issue-card.medium {
-  border-left: 5px solid orange;
+  border-left: 5px solid #D3D4C0;
 }
 
+
 .issue-card.low {
-  border-left: 5px solid green;
+  border-left: 5px solid #F3E4C9;
+}
+
+
+.severity-badge {
+  padding: 4px 8px;
+
+  border-radius: 8px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.severity-badge.high {
+  background:
+    rgba(
+      139,
+      94,
+      60,
+      0.45
+    );
+
+  color: #F3E4C9;
+}
+
+
+.severity-badge.medium {
+  background:
+    rgba(
+      211,
+      212,
+      192,
+      0.2
+    );
+
+  color: #F3E4C9;
+}
+
+
+.severity-badge.low {
+  background:
+    rgba(
+      243,
+      228,
+      201,
+      0.14
+    );
+
+  color: #F3E4C9;
+}
+
+
+/* =========================
+   NO ISSUES
+========================= */
+
+.no-issues {
+  margin-top: 20px;
+
+  color: #D3D4C0;
+
+  line-height: 1.5;
+}
+
+
+.no-issues-success {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  padding: 15px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(
+      243,
+      228,
+      201,
+      0.08
+    );
+
+  color: #D3D4C0;
+}
+
+
+.no-issues-success svg {
+  color: #F3E4C9;
+}
+
+
+/* =========================
+   MONACO LINE HIGHLIGHTS
+========================= */
+
+.line-high {
+  background:
+    rgba(
+      139,
+      94,
+      60,
+      0.32
+    );
+}
+
+
+.line-medium {
+  background:
+    rgba(
+      211,
+      212,
+      192,
+      0.18
+    );
+}
+
+
+.line-low {
+  background:
+    rgba(
+      243,
+      228,
+      201,
+      0.10
+    );
+}
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.issues-panel::-webkit-scrollbar {
+  width: 7px;
+}
+
+
+.issues-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.issues-panel::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background:
+    rgba(
+      211,
+      212,
+      192,
+      0.25
+    );
+}
+
+
+.issues-panel::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(
+      211,
+      212,
+      192,
+      0.45
+    );
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+
+  .split-view {
+    flex-direction: column;
+  }
+
+
+  .issues-panel {
+    min-width: 0;
+
+    max-height: none;
+  }
+
+
+  .editor-container {
+    width: 100%;
+  }
+
+}
+
+
+@media (max-width: 850px) {
+
+  .dashboard {
+    flex-direction: column;
+  }
+
+
+  .sidebar {
+    width: 100%;
+
+    min-width: 0;
+
+    padding: 20px;
+
+    border-right: none;
+
+    border-bottom:
+      1px solid
+      rgba(
+        243,
+        228,
+        201,
+        0.15
+      );
+  }
+
+
+  .sidebar h2 {
+    margin-bottom: 20px;
+  }
+
+
+  .menu {
+    flex-direction: row;
+
+    flex-wrap: wrap;
+  }
+
+
+  .menu-link {
+    flex: 1;
+  }
+
+
+  .menu p {
+    justify-content: center;
+  }
+
+
+  .main-panel {
+    padding: 25px;
+  }
+
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .main-panel {
+    padding: 18px;
+  }
+
+
+  .main-panel h1 {
+    font-size: 30px;
+  }
+
+
+  .upload-bar {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .upload-bar button {
+    justify-content: center;
+  }
+
+
+  .issue-heading {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+
+  .editor-container {
+    height: 420px;
+  }
+
+
+  .menu {
+    flex-direction: column;
+  }
+
 }

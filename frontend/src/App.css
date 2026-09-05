@@ -1,25 +1,18 @@
 .app-container {
+  min-height: 100vh;
 
-    min-height: 100vh;
+  margin: 0;
 
-    background:
-    radial-gradient(
-        circle at top left,
-        #8B5E3C,
-        transparent 35%
-    ),
+  padding: 0;
 
+  background:
     linear-gradient(
-        135deg,
-        #0A2947,
-        #081c31
+      135deg,
+      #0A2947,
+      #081c31
     );
 
-
-    padding: 50px;
-
-    color: #F3E4C9;
-
+  color: #F3E4C9;
 }
 
 
