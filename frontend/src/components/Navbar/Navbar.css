@@ -1,0 +1,112 @@
+.top-navbar {
+  width: 100%;
+  min-height: 78px;
+  padding: 14px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(243,228,201,0.08);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.navbar-icon {
+  width: 43px;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(139,94,60,0.28);
+  color: #F3E4C9;
+  font-size: 18px;
+}
+
+.navbar-left h2 {
+  margin: 0;
+  color: #F3E4C9;
+  font-size: 18px;
+}
+
+.navbar-left p {
+  margin: 4px 0 0;
+  color: #D3D4C0;
+  font-size: 12px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-user > svg {
+  font-size: 29px;
+  color: #D3D4C0;
+}
+
+.navbar-user div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-user span {
+  color: #D3D4C0;
+  font-size: 11px;
+}
+
+.navbar-user strong {
+  color: #F3E4C9;
+  font-size: 14px;
+}
+
+.navbar-logout {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(139,94,60,0.28);
+  color: #F3E4C9;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-logout:hover {
+  background: #8B5E3C;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 650px) {
+  .top-navbar {
+    padding: 12px 15px;
+  }
+
+  .navbar-left p {
+    display: none;
+  }
+
+  .navbar-user div {
+    display: none;
+  }
+}

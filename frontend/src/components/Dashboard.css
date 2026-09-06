@@ -452,3 +452,78 @@
     font-size: 30px;
   }
 }
+
+.main-panel {
+  flex: 1;
+  min-width: 0;
+  padding: 25px 35px 40px;
+}
+
+.dashboard-intro {
+  margin: 32px 0 22px;
+}
+
+.dashboard-intro h1 {
+  margin: 0;
+  color: #F3E4C9;
+  font-size: 34px;
+}
+
+.dashboard-intro p {
+  max-width: 700px;
+  margin: 8px 0 0;
+  color: #D3D4C0;
+  line-height: 1.6;
+}
+
+.issues-panel-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(243,228,201,0.08);
+}
+
+.issues-panel-header > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.issues-panel-header h2 {
+  margin: 0;
+}
+
+.issues-panel-header span {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(139,94,60,0.25);
+  color: #D3D4C0;
+  font-size: 12px;
+}
+
+.no-issues {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.no-issues > svg {
+  margin-bottom: 10px;
+  font-size: 32px;
+  color: #D3D4C0;
+}
+
+.no-issues h3,
+.no-issues-success h3 {
+  margin: 5px 0;
+  color: #F3E4C9;
+}
+
+.no-issues p,
+.no-issues-success p {
+  margin: 5px 0;
+  color: #D3D4C0;
+}

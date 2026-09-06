@@ -2,9 +2,9 @@ import React, {useState, useRef, useEffect} from "react";
 import Editor from "@monaco-editor/react";
 import {Link, useNavigate} from "react-router-dom";
 
+import Navbar from "./Navbar/Navbar";
 import QualityScore from "./Analytics/QualityScore";
 import IssueChart from "./Analytics/IssueChart";
-import AIRecommendation from "./Analytics/AIRecommendation";
 
 import {
   FaHome,
@@ -41,6 +41,7 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     navigate("/login");
   };
 
@@ -62,8 +63,8 @@ function Dashboard() {
 
     const reader = new FileReader();
 
-    reader.onload = (e) => {
-      setCode(e.target.result);
+    reader.onload = (event) => {
+      setCode(event.target.result);
     };
 
     reader.readAsText(selectedFile);
@@ -71,7 +72,9 @@ function Dashboard() {
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please select a file");
+      setError(
+        "Please select a code file first."
+      );
       return;
     }
 
@@ -83,7 +86,10 @@ function Dashboard() {
 
       setData(response);
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error(
+        "Upload error:",
+        error
+      );
 
       setError(
         error.response?.data?.detail ||
@@ -118,8 +124,10 @@ function Dashboard() {
     switch (severity) {
       case "HIGH":
         return <FaBug />;
+
       case "MEDIUM":
         return <FaShieldAlt />;
+
       default:
         return <FaCheckCircle />;
     }
@@ -127,7 +135,6 @@ function Dashboard() {
 
   const issues = (
     data?.analysis ||
-    data?.ai_review ||
     data?.issues ||
     []
   ).map((item) => {
@@ -190,7 +197,9 @@ function Dashboard() {
       return;
     }
 
-    editorRef.current.revealLineInCenter(line);
+    editorRef.current.revealLineInCenter(
+      line
+    );
 
     editorRef.current.setPosition({
       lineNumber: line,
@@ -205,7 +214,8 @@ function Dashboard() {
       return "python";
     }
 
-    const filename = file.name.toLowerCase();
+    const filename =
+      file.name.toLowerCase();
 
     if (
       filename.endsWith(".js") ||
@@ -279,16 +289,16 @@ function Dashboard() {
       </aside>
 
       <main className="main-panel">
-        <div className="dashboard-heading">
-          <div>
-            <h1>
-              AI Code Review
-            </h1>
+        <Navbar title="AI Code Review" />
 
-            <p className="subtitle">
-              Analyze your code with AI-powered insights
-            </p>
-          </div>
+        <div className="dashboard-intro">
+          <h1>
+            Review Your Code
+          </h1>
+
+          <p>
+            Upload a source code file and receive automated quality, security and style findings.
+          </p>
         </div>
 
         <div className="upload-bar">
@@ -303,10 +313,11 @@ function Dashboard() {
             disabled={loading}
           >
             <FaUpload />
+
             {
               loading
                 ? "Analyzing..."
-                : "Analyze"
+                : "Analyze Code"
             }
           </button>
         </div>
@@ -369,15 +380,35 @@ function Dashboard() {
           </div>
 
           <div className="issues-panel">
-            <h2>
-              AI Findings
-            </h2>
+            <div className="issues-panel-header">
+              <div>
+                <h2>
+                  Code Findings
+                </h2>
+
+                {
+                  data && (
+                    <span>
+                      {issues.length} issues
+                    </span>
+                  )
+                }
+              </div>
+            </div>
 
             {
               !data && (
-                <p className="no-issues">
-                  Upload and analyze a file to see AI findings.
-                </p>
+                <div className="no-issues">
+                  <FaShieldAlt />
+
+                  <h3>
+                    No analysis yet
+                  </h3>
+
+                  <p>
+                    Upload and analyze a file to see detected issues.
+                  </p>
+                </div>
               )
             }
 
@@ -387,16 +418,20 @@ function Dashboard() {
                 <div className="no-issues-success">
                   <FaCheckCircle />
 
+                  <h3>
+                    Great work
+                  </h3>
+
                   <p>
-                    No AI issues detected.
+                    No issues were detected in this file.
                   </p>
                 </div>
               )
             }
 
             {
-              issues.map((item, index) => {
-                return (
+              issues.map(
+                (item, index) => (
                   <div
                     key={index}
                     className={
@@ -435,7 +470,7 @@ function Dashboard() {
                       <p>
                         {
                           item.message ||
-                          "Code improvement detected."
+                          "Code quality issue detected."
                         }
                       </p>
 
@@ -449,34 +484,21 @@ function Dashboard() {
                         </span>
 
                         {
-                          item.score !== undefined &&
-                          item.score !== null && (
+                          item.source && (
                             <span>
-                              Confidence:{" "}
-                              {
-                                Number(
-                                  item.score
-                                ).toFixed(2)
-                              }
+                              Source:{" "}
+                              {item.source}
                             </span>
                           )
                         }
                       </div>
                     </div>
                   </div>
-                );
-              })
+                )
+              )
             }
           </div>
         </div>
-
-        {
-          data && (
-            <AIRecommendation
-              issues={issues}
-            />
-          )
-        }
       </main>
     </div>
   );
