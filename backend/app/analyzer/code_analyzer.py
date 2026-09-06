@@ -1,29 +1,24 @@
 import ast
 
-
 def analyze_python_code(file_path):
+    issues = []
 
-    issues=[]
-
-
-    with open(file_path,"r") as file:
-
-        code=file.read()
-
+    with open(
+        file_path,
+        "r",
+        encoding="utf-8"
+    ) as file:
+        code = file.read()
 
     try:
-
         ast.parse(code)
-
-
-    except SyntaxError as e:
-
+    except SyntaxError as error:
         issues.append({
-
-            "type":"Syntax Error",
-            "message":str(e)
-
+            "title": "Python Syntax Error",
+            "message": error.msg,
+            "severity": "HIGH",
+            "line": error.lineno,
+            "source": "Python AST"
         })
-
 
     return issues

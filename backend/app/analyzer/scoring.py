@@ -8,7 +8,7 @@ def calculate_quality_score(issues):
     }
 
     severity_caps = {
-        "HIGH": 36,
+        "HIGH": 48,
         "MEDIUM": 30,
         "LOW": 20
     }
@@ -20,21 +20,24 @@ def calculate_quality_score(issues):
     }
 
     for issue in issues:
-        severity = issue.get(
-            "severity",
-            "LOW"
+        severity = (
+            issue.get(
+                "severity",
+                "LOW"
+            )
+            .upper()
         )
 
-        penalty = penalties.get(
-            severity,
-            2
+        if severity not in penalties:
+            severity = "LOW"
+
+        severity_totals[severity] += (
+            penalties[severity]
         )
 
-        severity_totals[severity] += penalty
-
-    for severity, total in severity_totals.items():
+    for severity in severity_totals:
         score -= min(
-            total,
+            severity_totals[severity],
             severity_caps[severity]
         )
 
