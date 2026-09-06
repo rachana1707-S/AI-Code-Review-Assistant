@@ -10,6 +10,7 @@ import Reviews from "./components/Reviews/Reviews";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import Settings from "./components/Settings/Settings";
 
 import "./App.css";
 
@@ -41,6 +42,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Reviews />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />

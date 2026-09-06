@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta, timezone
 import os
+import bcrypt
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -20,22 +20,37 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not configured.")
 
-password_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
-
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login"
 )
 
 def hash_password(password: str):
-    return password_context.hash(password)
+    password_bytes = password.encode("utf-8")
 
-def verify_password(plain_password: str, hashed_password: str):
-    return password_context.verify(
-        plain_password,
-        hashed_password
+    if len(password_bytes) > 72:
+        raise ValueError(
+            "Password cannot exceed 72 bytes."
+        )
+
+    salt = bcrypt.gensalt()
+
+    return bcrypt.hashpw(
+        password_bytes,
+        salt
+    ).decode("utf-8")
+
+def verify_password(
+    plain_password: str,
+    hashed_password: str
+):
+    password_bytes = plain_password.encode("utf-8")
+
+    if len(password_bytes) > 72:
+        return False
+
+    return bcrypt.checkpw(
+        password_bytes,
+        hashed_password.encode("utf-8")
     )
 
 def create_access_token(data: dict):

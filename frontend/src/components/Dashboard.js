@@ -249,10 +249,15 @@ function Dashboard() {
             </p>
           </Link>
 
-          <p>
-            <FaCog />
-            Settings
-          </p>
+          <Link
+            to="/settings"
+            className="menu-link"
+          >
+            <p>
+              <FaCog />
+              Settings
+            </p>
+          </Link>
         </div>
 
         <div className="sidebar-user">

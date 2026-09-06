@@ -26,7 +26,19 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const requestUrl = error.config?.url || "";
+    const token = localStorage.getItem("token");
+
+    const isAuthRequest =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register");
+
+    if (
+      status === 401 &&
+      token &&
+      !isAuthRequest
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
@@ -59,6 +71,15 @@ export const loginUser = async (userData) => {
 
 export const getCurrentUser = async () => {
   const response = await api.get("/me");
+
+  return response.data;
+};
+
+export const updateProfile = async (userData) => {
+  const response = await api.put(
+    "/auth/profile",
+    userData
+  );
 
   return response.data;
 };
